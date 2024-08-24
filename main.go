@@ -1,7 +1,9 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"github.com/jackc/pgx/v4"
 	"github.com/spf13/viper"
 	"log"
 )
@@ -31,6 +33,17 @@ func initConfig() {
 	if err != nil {
 		log.Fatalf("Unable to decode into struct, %v", err)
 	}
+}
+
+func connectDB() (*pgx.Conn, error) {
+	connStr := fmt.Sprintf("postgres://%s:%s@%s:%d/%s",
+		config.Database.User, config.Database.Password, config.Database.Host, config.Database.Port, config.Database.Name)
+
+	conn, err := pgx.Connect(context.Background(), connStr)
+	if err != nil {
+		return nil, err
+	}
+	return conn, nil
 }
 
 func main() {
