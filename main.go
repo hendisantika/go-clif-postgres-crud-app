@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/ukautz/clif"
 	"log"
+	"strconv"
 )
 
 type Config struct {
@@ -66,6 +67,31 @@ func createUser(c *clif.Command) error {
 	}
 
 	fmt.Println("User created successfully!")
+	return nil
+}
+
+func readUser(c *clif.Command) error {
+	if c.ParameterCount() < 1 {
+		return fmt.Errorf("usage: read <id>")
+	}
+	id, err := strconv.Atoi(c.Parameter(0))
+	if err != nil {
+		return fmt.Errorf("invalid user ID")
+	}
+
+	conn, err := connectDB()
+	if err != nil {
+		return err
+	}
+	defer conn.Close(context.Background())
+
+	var name, email string
+	err = conn.QueryRow(context.Background(), "SELECT name, email FROM users WHERE id=$1", id).Scan(&name, &email)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("User: %s, Email: %s\n", name, email)
 	return nil
 }
 
