@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/jackc/pgx/v4"
 	"github.com/spf13/viper"
+	"github.com/ukautz/clif"
 	"log"
 )
 
@@ -44,6 +45,28 @@ func connectDB() (*pgx.Conn, error) {
 		return nil, err
 	}
 	return conn, nil
+}
+
+func createUser(c *clif.Command) error {
+	if c.ParameterCount() < 2 {
+		return fmt.Errorf("usage: create <name> <email>")
+	}
+	name := c.Parameter(0)
+	email := c.Parameter(1)
+
+	conn, err := connectDB()
+	if err != nil {
+		return err
+	}
+	defer conn.Close(context.Background())
+
+	_, err = conn.Exec(context.Background(), "INSERT INTO users (name, email) VALUES ($1, $2)", name, email)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("User created successfully!")
+	return nil
 }
 
 func main() {
