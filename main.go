@@ -121,6 +121,30 @@ func updateUser(c *clif.Command) error {
 	return nil
 }
 
+func deleteUser(c *clif.Command) error {
+	if c.ParameterCount() < 1 {
+		return fmt.Errorf("usage: delete <id>")
+	}
+	id, err := strconv.Atoi(c.Parameter(0))
+	if err != nil {
+		return fmt.Errorf("invalid user ID")
+	}
+
+	conn, err := connectDB()
+	if err != nil {
+		return err
+	}
+	defer conn.Close(context.Background())
+
+	_, err = conn.Exec(context.Background(), "DELETE FROM users WHERE id=$1", id)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("User deleted successfully!")
+	return nil
+}
+
 func main() {
 	//TIP Press <shortcut actionId="ShowIntentionActions"/> when your caret is at the underlined or highlighted text
 	// to see how GoLand suggests fixing it.
