@@ -95,6 +95,32 @@ func readUser(c *clif.Command) error {
 	return nil
 }
 
+func updateUser(c *clif.Command) error {
+	if c.ParameterCount() < 3 {
+		return fmt.Errorf("usage: update <id> <name> <email>")
+	}
+	id, err := strconv.Atoi(c.Parameter(0))
+	if err != nil {
+		return fmt.Errorf("invalid user ID")
+	}
+	name := c.Parameter(1)
+	email := c.Parameter(2)
+
+	conn, err := connectDB()
+	if err != nil {
+		return err
+	}
+	defer conn.Close(context.Background())
+
+	_, err = conn.Exec(context.Background(), "UPDATE users SET name=$1, email=$2 WHERE id=$3", name, email, id)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("User updated successfully!")
+	return nil
+}
+
 func main() {
 	//TIP Press <shortcut actionId="ShowIntentionActions"/> when your caret is at the underlined or highlighted text
 	// to see how GoLand suggests fixing it.
