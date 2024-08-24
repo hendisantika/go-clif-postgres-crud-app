@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/ukautz/clif"
 	"log"
+	"os"
 	"strconv"
 )
 
@@ -146,18 +147,16 @@ func deleteUser(c *clif.Command) error {
 }
 
 func main() {
-	//TIP Press <shortcut actionId="ShowIntentionActions"/> when your caret is at the underlined or highlighted text
-	// to see how GoLand suggests fixing it.
-	s := "gopher"
-	fmt.Println("Hello and welcome, %s!", s)
+	initConfig()
 
-	for i := 1; i <= 5; i++ {
-		//TIP You can try debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-		// for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>. To start your debugging session,
-		// right-click your code in the editor and select the <b>Debug</b> option.
-		fmt.Println("i =", 100/i)
+	cli := clif.New("CRUD App", "A simple CLI to perform CRUD operations", "0.1.0")
+
+	cli.New("create", "Create a new user", createUser)
+	cli.New("read", "Read user information", readUser)
+	cli.New("update", "Update user information", updateUser)
+	cli.New("delete", "Delete a user", deleteUser)
+
+	if err := cli.Run(os.Args); err != nil {
+		log.Fatal(err)
 	}
 }
-
-//TIP See GoLand help at <a href="https://www.jetbrains.com/help/go/">jetbrains.com/help/go/</a>.
-// Also, you can try interactive lessons for GoLand by selecting 'Help | Learn IDE Features' from the main menu.
